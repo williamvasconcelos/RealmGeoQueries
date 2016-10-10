@@ -16,7 +16,7 @@ It's not necessary to include Geohash or other types of indexes in the model cla
 ### Installation with CocoaPods
 
 ```ruby
-platform :ios, '8.0'
+platform :ios, '9.0'
 pod "RealmGeoQueries"
 ```
 
@@ -28,7 +28,7 @@ pod "RealmGeoQueries"
 
 | Version | Language  | Minimum iOS Target  |
 |:--------------------:|:---------------------------:|:---------------------------:|
-|          1.x         |            Swift            |            iOS 8            |
+|          1.x         |            Swift            |            iOS 9            |
 
 ### Usage
 

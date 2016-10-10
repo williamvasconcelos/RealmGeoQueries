@@ -9,6 +9,7 @@
 import RealmSwift
 import CoreLocation
 import MapKit
+import Swift
 
 // MARK: - Public extensions
 public extension Realm {
@@ -23,7 +24,7 @@ public extension Realm {
      
      - returns: Found objects inside MKCoordinateRegion
      */
-    func findInRegion<T: Object>(type: T.Type, region: MKCoordinateRegion, latitudeKey: String = "lat", longitudeKey: String = "lng") -> Results<T> {
+    func findInRegion<T: Object>(_ type: T.Type, region: MKCoordinateRegion, latitudeKey: String = "lat", longitudeKey: String = "lng") -> Results<T> {
         
         // Query
         return self
@@ -42,7 +43,7 @@ public extension Realm {
      
      - returns: Found objects inside GeoBox
      */
-    func findInBox<T: Object>(type: T.Type, box: GeoBox, latitudeKey: String = "lat", longitudeKey: String = "lng") -> Results<T> {
+    func findInBox<T: Object>(_ type: T.Type, box: GeoBox, latitudeKey: String = "lat", longitudeKey: String = "lng") -> Results<T> {
         
         // Query
         return self
@@ -63,7 +64,7 @@ public extension Realm {
      
      - returns: Found objects inside radius around the center coordinate
      */
-    func findNearby<T: Object>(type: T.Type, origin center: CLLocationCoordinate2D, radius: Double, sortAscending sort: Bool?, latitudeKey: String = "lat", longitudeKey: String = "lng") -> [T] {
+    func findNearby<T: Object>(_ type: T.Type, origin center: CLLocationCoordinate2D, radius: Double, sortAscending sort: Bool?, latitudeKey: String = "lat", longitudeKey: String = "lng") -> [T] {
         
         // Query
         return self
@@ -86,7 +87,7 @@ public extension Results {
      
      - returns: Filtered objects inside MKCoordinateRegion
      */
-    func filterGeoRegion(region: MKCoordinateRegion, latitudeKey: String = "lat", longitudeKey: String = "lng") -> Results<T> {
+    func filterGeoRegion(_ region: MKCoordinateRegion, latitudeKey: String = "lat", longitudeKey: String = "lng") -> Results<T> {
         
         let box = region.geoBox
         
@@ -107,7 +108,7 @@ public extension Results {
      
      - returns: Filtered objects inside GeoBox
      */
-    func filterGeoBox(box: GeoBox, latitudeKey: String = "lat", longitudeKey: String = "lng") -> Results<T> {
+    func filterGeoBox(_ box: GeoBox, latitudeKey: String = "lat", longitudeKey: String = "lng") -> Results<T> {
         
         let topLeftPredicate = NSPredicate(format: "%K <= %f AND %K >= %f", latitudeKey, box.topLeft.latitude, longitudeKey, box.topLeft.longitude)
         let bottomRightPredicate = NSPredicate(format: "%K >= %f AND %K <= %f", latitudeKey, box.bottomRight.latitude, longitudeKey, box.bottomRight.longitude)
@@ -128,7 +129,7 @@ public extension Results {
      
      - returns: Found objects inside radius around the center coordinate
      */
-    func filterGeoRadius(center: CLLocationCoordinate2D, radius: Double, sortAscending sort: Bool?, latitudeKey: String = "lat", longitudeKey: String = "lng") -> [T] {
+    func filterGeoRadius(_ center: CLLocationCoordinate2D, radius: Double, sortAscending sort: Bool?, latitudeKey: String = "lat", longitudeKey: String = "lng") -> [T] {
         
         // Get box
         let inBox = self.filterGeoBox(center.geoBox(radius), latitudeKey: latitudeKey, longitudeKey: longitudeKey)
@@ -152,7 +153,7 @@ public extension Results {
         
     }
     
-    func sortByDistance(center: CLLocationCoordinate2D, ascending: Bool, latitudeKey: String = "lat", longitudeKey: String = "lng") -> [T] {
+    func sortByDistance(_ center: CLLocationCoordinate2D, ascending: Bool, latitudeKey: String = "lat", longitudeKey: String = "lng") -> [T] {
         
         return self
             .addDistance(center, latitudeKey: latitudeKey, longitudeKey: longitudeKey)
@@ -187,7 +188,7 @@ public extension CLLocationCoordinate2D {
      
      - returns: GeoBox struct
      */
-    func geoBox(radius: Double) -> GeoBox {
+    func geoBox(_ radius: Double) -> GeoBox {
         
         return MKCoordinateRegionMakeWithDistance(self, radius * 2.0, radius * 2.0).geoBox
         
@@ -226,14 +227,14 @@ private extension Results {
      
      - returns: Array of results sorted
      */
-    func addDistance(center: CLLocationCoordinate2D, latitudeKey: String = "lat", longitudeKey: String = "lng") -> [T] {
+    func addDistance(_ center: CLLocationCoordinate2D, latitudeKey: String = "lat", longitudeKey: String = "lng") -> [T] {
         
         return self.map { (obj) -> T in
             
             // Calculate distance
-            let location = CLLocation(latitude: obj.valueForKeyPath(latitudeKey) as! CLLocationDegrees, longitude: obj.valueForKeyPath(longitudeKey) as! CLLocationDegrees)
+            let location = CLLocation(latitude: obj.value(forKeyPath:latitudeKey) as! CLLocationDegrees, longitude: obj.value(forKeyPath:longitudeKey) as! CLLocationDegrees)
             let center = CLLocation(latitude: center.latitude, longitude: center.longitude)
-            let distance = location.distanceFromLocation(center)
+            let distance = location.distance(from:center)
 
             // Save
             obj.objDist = distance
@@ -255,9 +256,9 @@ private extension Array where Element:Object {
      
      - returns: Array of [Object] sorted by distance
      */
-    func sort(ascending: Bool = true) -> [Generator.Element] {
+    func sort(_ ascending: Bool = true) -> [Iterator.Element] {
         
-        return self.sort({ (a: Object, b: Object) -> Bool in
+        return self.sorted(by: { (a: Object, b: Object) -> Bool in
             
             if ascending {
                 
@@ -277,11 +278,11 @@ private extension Array where Element:Object {
 
 private extension Object {
     
-    private struct AssociatedKeys {
+    struct AssociatedKeys {
         static var DistanceKey = "DistanceKey"
     }
     
-    private var objDist: Double {
+    var objDist: Double {
         get {
             guard let value = objc_getAssociatedObject(self, &AssociatedKeys.DistanceKey) as? Double else { return 0.0 }
             return value

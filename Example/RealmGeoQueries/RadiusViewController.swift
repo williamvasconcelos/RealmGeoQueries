@@ -60,19 +60,19 @@ class RadiusViewController: UIViewController {
         
         // Add circle
         mapView.removeOverlays(mapView.overlays)
-        let circle = MKCircle(centerCoordinate: mapView.centerCoordinate, radius: radius)
-        mapView.addOverlay(circle)
+        let circle = MKCircle(center: mapView.centerCoordinate, radius: radius)
+        mapView.add(circle)
         
     }
     
     //MARK:- MKMapViewDelegate
-    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         
         reloadData()
         
     }
     
-    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+    func mapView(_ mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         
         // User location
         if annotation is MKUserLocation {
@@ -84,7 +84,7 @@ class RadiusViewController: UIViewController {
         }
         
         // Marinas
-        var pin = mapView.dequeueReusableAnnotationViewWithIdentifier(AnnotationIdentifier)
+        var pin = mapView.dequeueReusableAnnotationView(withIdentifier: AnnotationIdentifier)
         if pin == nil {
             pin = MKPinAnnotationView(annotation: annotation, reuseIdentifier: AnnotationIdentifier)
             pin?.canShowCallout = true
@@ -96,10 +96,10 @@ class RadiusViewController: UIViewController {
         
     }
     
-    func mapView(mapView: MKMapView, rendererForOverlay overlay: MKOverlay) -> MKOverlayRenderer {
+    func mapView(_ mapView: MKMapView, rendererForOverlay overlay: MKOverlay) -> MKOverlayRenderer {
         
         let circle = MKCircleRenderer(overlay: overlay)
-        circle.strokeColor = UIColor.redColor()
+        circle.strokeColor = UIColor.red
         circle.fillColor = UIColor(red: 255, green: 0, blue: 0, alpha: 0.1)
         circle.lineWidth = 1
         return circle

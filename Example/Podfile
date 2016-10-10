@@ -1,6 +1,12 @@
-source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '8.0'
+platform :ios, '9.3'
 use_frameworks!
-inhibit_all_warnings!
 
-pod 'RealmSwift'
+def next_pods
+    # Data storage
+    pod 'RealmSwift', '~> 1.1.0'
+end
+
+
+target 'RealmGeoQueries' do
+    next_pods
+end
